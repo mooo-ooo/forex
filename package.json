@@ -21,7 +21,11 @@
     "styled-system": "^5.1.5",
     "formik": "^2.4.1",
     "yup": "^1.2.0",
-    "react-router-dom": "^6.11.2"
+    "react-router-dom": "^6.11.2",
+    "recharts": "^2.6.2"
+  },
+  "devDependencies": {
+    "@types/styled-components": "^5.1.26"
   },
   "scripts": {
     "start": "react-scripts start",
