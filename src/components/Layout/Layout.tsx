@@ -14,7 +14,7 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
 }
 
 const LayoutStyled = styled.div`
-  background: radial-gradient(103.12%50%at 50%50%,#21193a 0%,#191326 100%);
+  background: linear-gradient(180deg,#202738 0,#070816 100%);
 `
 
 const BodyStyled = styled.div`
