@@ -1,15 +1,31 @@
 import styled from "styled-components"
-import   { Flex } from 'uikit/Box'
-import Button from "uikit/Button";
+import { Flex } from 'uikit/Box'
+import Button from "uikit/Button"
+import { Text } from 'rebass'
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { InjectedConnector } from 'wagmi/connectors/injected'
 
 function Header() {
+  const { address } = useAccount()
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  })
+  const { disconnect } = useDisconnect()
   return (
     <HeaderStyled>
       <Flex width="100%" alignItems="center" justifyContent="space-around">
         <h2>
           My Header
         </h2>
-        <Button scale="sm">Connect</Button>
+        <div>
+          {address ?
+            <Flex>
+              <Text>Connected to {address}</Text>
+              <Button onClick={() => disconnect()} scale="sm">Disconnect</Button>
+            </Flex>
+            : <Button onClick={() => connect()} scale="sm">Connect</Button>
+          }
+        </div>
       </Flex>
       
     </HeaderStyled>
