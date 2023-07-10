@@ -1,4 +1,5 @@
 import styled from "styled-components"
+import { Text } from "rebass";
 import { Flex } from 'uikit/Box'
 import Button from "uikit/Button"
 import { UserMenuItemProps } from "./types";
@@ -17,9 +18,9 @@ function Header() {
   return (
     <HeaderStyled>
       <Flex width="100%" alignItems="center" justifyContent="space-around">
-        <h2>
+        <Text>
           My Header
-        </h2>
+        </Text>
         <div>
           {address ?
             <StyledUserMenu>
@@ -39,7 +40,8 @@ function Header() {
 }
 
 const HeaderStyled = styled.nav`
-  position: fixed;
+  position: sticky;
+  z-index: 99;
   top: 0;
   width: 100%;
   display: flex;

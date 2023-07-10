@@ -74,7 +74,7 @@ export const mediaQueries = {
 }
 
 const cardTheme = {
-  background: colors.backgroundAlt,
+  background: '#272627',
   boxShadow: shadows.level1,
   boxShadowActive: shadows.active,
   boxShadowSuccess: shadows.success,

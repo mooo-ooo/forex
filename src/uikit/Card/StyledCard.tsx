@@ -8,30 +8,8 @@ interface StyledCardProps extends CardProps {
   theme: DefaultTheme & ForexTheme;
 }
 
-/**
- * Priority: Warning --> Success --> Active
- */
-const getBorderColor = ({ isActive, isSuccess, isWarning, borderBackground, theme }: StyledCardProps) => {
-  if (borderBackground) {
-    return borderBackground;
-  }
-  if (isWarning) {
-    return theme.colors.warning;
-  }
-
-  if (isSuccess) {
-    return theme.colors.success;
-  }
-
-  if (isActive) {
-    return `linear-gradient(180deg, ${theme.colors.primaryBright}, ${theme.colors.secondary})`;
-  }
-
-  return theme.colors.cardBorder;
-};
-
 export const StyledCard = styled.div<StyledCardProps>`
-  background: ${getBorderColor};
+  background: #272627;
   border-radius: 8px;
   color: ${({ theme, isDisabled }) => theme.colors[isDisabled ? "textDisabled" : "text"]};
   overflow: hidden;
