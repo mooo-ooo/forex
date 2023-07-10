@@ -1,5 +1,3 @@
-import { DefaultTheme } from "styled-components"
-
 export const baseColors = {
   white: 'white',
   failure: '#ED4B9E',
@@ -14,6 +12,17 @@ export const baseColors = {
   warning: '#FFB237',
   warning2D: '#ED4B9E2D',
   warning33: '#ED4B9E33',
+}
+
+export const shadows = {
+  level1: '0px 2px 12px -8px rgba(25, 19, 38, 0.1), 0px 1px 1px rgba(25, 19, 38, 0.05)',
+  active: '0px 0px 0px 1px #0098A1, 0px 0px 4px 8px rgba(31, 199, 212, 0.4)',
+  success: '0px 0px 0px 1px #31D0AA, 0px 0px 0px 4px rgba(49, 208, 170, 0.2)',
+  warning: '0px 0px 0px 1px #D67E0A, 0px 0px 0px 4px rgba(214, 126, 10, 0.2)',
+  danger: '0px 0px 0px 1px #ED4B9E, 0px 0px 0px 4px rgba(237, 75, 158, 0.2)',
+  focus: '0px 0px 0px 1px #7645D9, 0px 0px 0px 4px rgba(118, 69, 217, 0.6)',
+  inset: 'inset 0px 2px 2px -1px rgba(74, 74, 104, 0.1)',
+  tooltip: '0px 0px 2px rgba(0, 0, 0, 0.2), 0px 4px 12px -8px rgba(14, 14, 44, 0.1)',
 }
 
 export const colors = {
@@ -64,14 +73,47 @@ export const mediaQueries = {
   xxl: `@media screen and (min-width: ${breakpoints.xxl}px)`,
 }
 
+const cardTheme = {
+  background: colors.backgroundAlt,
+  boxShadow: shadows.level1,
+  boxShadowActive: shadows.active,
+  boxShadowSuccess: shadows.success,
+  boxShadowWarning: shadows.warning,
+  cardHeaderBackground: {
+    default: colors.gradientCardHeader,
+    blue: colors.gradientBlue,
+    bubblegum: colors.gradientBubblegum,
+    violet: colors.gradientViolet,
+  },
+  dropShadow: "drop-shadow(0px 1px 4px rgba(25, 19, 38, 0.15))",
+}
+
+export type MediaQueries = {
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+  xxl: string;
+};
+
 export type Breakpoint = keyof typeof breakpoints
+export type Breakpoints = string[];
 
 export const breakpointNames = Object.keys(breakpoints) as Breakpoint[]
 
-const defaultTheme: DefaultTheme = {
+export interface ForexTheme {
+  colors: typeof colors;
+  card: typeof cardTheme;
+  breakpoints: Breakpoints;
+  mediaQueries: MediaQueries;
+}
+
+const defaultTheme: ForexTheme = {
   colors,
   mediaQueries,
-  breakpoints: breakpointNames
+  breakpoints: breakpointNames,
+  card: cardTheme
 }
 
 export default defaultTheme
