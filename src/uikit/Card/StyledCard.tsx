@@ -8,6 +8,7 @@ interface StyledCardProps extends CardProps {
   theme: DefaultTheme & ForexTheme;
 }
 
+
 export const StyledCard = styled.div<StyledCardProps>`
   background: #272627;
   border-radius: 8px;
