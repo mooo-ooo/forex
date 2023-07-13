@@ -102,18 +102,31 @@ export type Breakpoints = string[];
 
 export const breakpointNames = Object.keys(breakpoints) as Breakpoint[]
 
+export type TooltipTheme = {
+  background: string;
+  text: string;
+  boxShadow: string;
+};
+
+export const tooltip: TooltipTheme = {
+  background: colors.backgroundAlt,
+  text: colors.text,
+  boxShadow: shadows.tooltip,
+};
 export interface ForexTheme {
   colors: typeof colors;
   card: typeof cardTheme;
   breakpoints: Breakpoints;
   mediaQueries: MediaQueries;
+  tooltip: TooltipTheme
 }
 
 const defaultTheme: ForexTheme = {
   colors,
   mediaQueries,
   breakpoints: breakpointNames,
-  card: cardTheme
+  card: cardTheme,
+  tooltip,
 }
 
 export default defaultTheme

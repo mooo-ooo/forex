@@ -2,7 +2,8 @@ import { Card } from 'uikit/Card'
 import { Flex } from 'uikit/Box'
 import { Text } from 'rebass'
 import styled, { useTheme } from 'styled-components'
-import TokenPairImage from 'uikit/Image/TokenPairImage';
+import TokenPairImage from 'uikit/Image/TokenPairImage'
+import AprRowWithToolTip from './AprRowWithToolTip'
 
 const USDT = '/tokens/usdt.png'
 function Home() {
@@ -18,6 +19,13 @@ function Home() {
             </Flex>
             <TokenPairImage primarySrc={USDT} secondarySrc={USDT} width={64} height={64} />
           </CardHeader>
+          <Flex p="24px">
+            <Flex justifyContent="space-between" width="100%" alignItems="center">
+              <AprRowWithToolTip questionTooltip="" />
+              <Text fontSize={14} color={theme.colors.textSubtle}>80%</Text>
+            </Flex>
+          </Flex>
+          
         </FarmCardInnerContainer>
       </StyledCard>
     </div>
@@ -27,8 +35,9 @@ function Home() {
 export default Home;
 
 const CardHeader = styled(Flex)`
-  background: var(--colors-gradientCardHeader);
+  background: linear-gradient(166.77deg,#3b4155,#3a3045);
   border-radius: var(--radii-card) var(--radii-card) 0 0;
+  padding: 24px;
 `;
 
 const StyledCard = styled(Card)`
@@ -44,5 +53,4 @@ const StyledCard = styled(Card)`
 const FarmCardInnerContainer = styled(Flex)`
   flex-direction: column;
   justify-content: space-around;
-  padding: 24px;
 `
