@@ -21,7 +21,7 @@ const LayoutStyled = styled.div`
 
 const BodyStyled = styled(Container)`
   margin-top: 57px;
-  padding: 32px;
+  padding: 24px;
   min-height: 100vh
 `
 

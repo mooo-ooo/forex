@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Text } from "rebass";
+import Logo from 'uikit/Icons/Logo'
 import { Flex } from 'uikit/Box'
 import Button from "uikit/Button"
 import { UserMenuItemProps } from "./types";
@@ -18,9 +18,7 @@ function Header() {
   return (
     <HeaderStyled>
       <Flex width="100%" alignItems="center" justifyContent="space-around">
-        <Text>
-          My Header
-        </Text>
+        <Logo />
         <div>
           {address ?
             <StyledUserMenu>

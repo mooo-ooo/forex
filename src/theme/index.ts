@@ -2,7 +2,7 @@ export const baseColors = {
   white: 'white',
   failure: '#ED4B9E',
   failure33: '#ED4B9E33',
-  primary: '#F57C00',
+  primary: '#1fc7d4',
   primary0f: '#1FC7D40f',
   primary3D: '#1FC7D43D',
   primaryBright: '#53DEE9',
@@ -32,7 +32,7 @@ export const colors = {
   background: '#F6F6F6',
   backgroundDisabled: '#E9EAEB',
   backgroundAlt: '#FFFFFF',
-  cardBorder: '#E7E3EB',
+  cardBorder: '#383241',
   contrast: '#191326',
   dropdown: '#F6F6F6',
   dropdownDeep: '#EEEEEE',
@@ -119,6 +119,7 @@ export interface ForexTheme {
   breakpoints: Breakpoints;
   mediaQueries: MediaQueries;
   tooltip: TooltipTheme
+  shadows: typeof shadows
 }
 
 const defaultTheme: ForexTheme = {
@@ -127,6 +128,7 @@ const defaultTheme: ForexTheme = {
   breakpoints: breakpointNames,
   card: cardTheme,
   tooltip,
+  shadows,
 }
 
 export default defaultTheme
