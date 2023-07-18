@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Card } from 'uikit/Card'
 import { Flex } from 'uikit/Box'
 import { Text } from 'rebass'
@@ -6,14 +7,45 @@ import { Input } from 'uikit/Input'
 import { AiOutlineFieldTime } from 'react-icons/ai'
 import styled, { useTheme } from 'styled-components'
 import TokenPairImage from 'uikit/Image/TokenPairImage'
+import { useAccount, useSignTypedData } from 'wagmi'
 import AprRowWithToolTip from './AprRowWithToolTip'
 
 const USDT = '/tokens/usdt.png'
+const timestamp = new Date().valueOf()
 
+const DOMAIN = [
+  {name: "url", type: "string"},
+  {name: "time", type: "uint256"},
+];
+
+const DATA = [
+  {name: "action", type: "string"},
+  {name: "user", type: "address"},
+];
+
+const TYPES = {
+  EIP712Domain: DOMAIN,
+  Data: DATA,
+}
 function Home() {
+  const { address } = useAccount()
   const { colors: { textSecondary, textSubtle }} = useTheme()
+  const domain: any = {
+    url: "https://tothemoon.io/",
+    time: timestamp
+  }
+  const { data, isError, isLoading, isSuccess, signTypedData } = useSignTypedData({
+    domain,
+    message: {
+      action: "Deposit",
+      user: address,
+  },
+    primaryType: 'Data',
+    types: TYPES,
+  })
+
   return (
-    <div className="App">
+    <Flex className="App" justify-content="center">
       <StyledCard>
         <FarmCardInnerContainer>
           <CardHeader justifyContent="space-between">
@@ -45,7 +77,7 @@ function Home() {
               <Text fontSize={12} color={textSubtle}>Balance: 1,200</Text>
             </CardRow>
             <Input color={textSubtle} />
-            <Button mt="12px" variant='primary'>Deposit</Button>
+            <Button mt="12px" variant='primary' onClick={() => signTypedData()}>Deposit</Button>
           </CardBody>
           <CardFooter>
             <CardRow>
@@ -59,7 +91,7 @@ function Home() {
           </CardFooter>
         </FarmCardInnerContainer>
       </StyledCard>
-    </div>
+    </Flex>
   );
 }
 
@@ -92,6 +124,7 @@ const StyledCard = styled(Card)`
   align-self: baseline;
   max-width: 100%;
   margin: 0 0 24px 0;
+  width: 350px;
   ${({ theme }) => theme.mediaQueries.sm} {
     max-width: 350px;
     margin: 0 12px 46px;

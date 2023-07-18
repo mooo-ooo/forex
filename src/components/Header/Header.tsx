@@ -1,10 +1,11 @@
-import styled from "styled-components"
+import styled, { useTheme } from "styled-components"
 import Logo from 'uikit/Icons/Logo'
 import { Flex } from 'uikit/Box'
 import Button from "uikit/Button"
 import { UserMenuItemProps } from "./types";
 import { FiChevronDown } from 'react-icons/fi'
 import { IoWalletOutline } from 'react-icons/io5'
+import Container from 'components/Layout/Container'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 
@@ -13,26 +14,28 @@ function Header() {
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   })
+  const theme = useTheme()
   const { disconnect } = useDisconnect()
   const accountEllipsis = address ? `${address.substring(0, 2)}...${address.substring(address.length - 4)}` : undefined;
   return (
     <HeaderStyled>
-      <Flex width="100%" alignItems="center" justifyContent="space-around">
-        <Logo />
-        <div>
-          {address ?
-            <StyledUserMenu>
-              <IoWalletOutline fontSize={24} />
-              <LabelText title={address}>
-                {accountEllipsis}
-              </LabelText>
-              <FiChevronDown />
-            </StyledUserMenu>
-            : <Button onClick={() => connect()} scale="sm">Connect</Button>
-          }
-        </div>
-      </Flex>
-      
+      <Container width='100%'>
+        <Flex width="100%" alignItems="center" justifyContent="space-between">
+          <Logo />
+          <div>
+            {address ?
+              <StyledUserMenu>
+                <IoWalletOutline fontSize={24} color={theme.colors.text} />
+                <LabelText title={address}>
+                  {accountEllipsis}
+                </LabelText>
+                <FiChevronDown color={theme.colors.text} />
+              </StyledUserMenu>
+              : <Button onClick={() => connect()} scale="sm">Connect</Button>
+            }
+          </div>
+        </Flex>
+      </Container>
     </HeaderStyled>
   );
 }
@@ -44,7 +47,6 @@ const HeaderStyled = styled.nav`
   width: 100%;
   display: flex;
   -webkit-box-pack: justify;
-  justify-content: space-between;
   -webkit-box-align: center;
   align-items: center;
   width: 100%;
@@ -109,33 +111,6 @@ export const UserMenuItem = styled.button<UserMenuItemProps>`
   &:active:not(:disabled) {
     opacity: 0.85;
     transform: translateY(1px);
-  }
-`;
-
-const Menu = styled.div<{ isOpen: boolean }>`
-  background-color: ${({ theme }) => theme.card.background};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 16px;
-  padding-bottom: 4px;
-  padding-top: 4px;
-  pointer-events: auto;
-  width: 280px;
-  visibility: visible;
-  z-index: 1001;
-
-  ${({ isOpen }) =>
-    !isOpen &&
-    `
-    pointer-events: none;
-    visibility: hidden;
-  `}
-
-  ${UserMenuItem}:first-child {
-    border-radius: 8px 8px 0 0;
-  }
-
-  ${UserMenuItem}:last-child {
-    border-radius: 0 0 8px 8px;
   }
 `;
 
