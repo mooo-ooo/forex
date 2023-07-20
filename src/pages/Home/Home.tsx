@@ -32,7 +32,7 @@ function Home() {
   const { colors: { textSecondary, textSubtle }} = useTheme()
   const domain: any = {
     url: "https://tothemoon.io/",
-    time: timestamp
+    time: Math.floor(timestamp / 1000 / 60 / 60)
   }
   const { data, isError, isLoading, isSuccess, signTypedData } = useSignTypedData({
     domain,
@@ -43,7 +43,7 @@ function Home() {
     primaryType: 'Data',
     types: TYPES,
   })
-
+  console.log({data})
   return (
     <Flex className="App" justify-content="center">
       <StyledCard>
