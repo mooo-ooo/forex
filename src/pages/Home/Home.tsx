@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Card } from 'uikit/Card'
 import { Flex } from 'uikit/Box'
 import { Text } from 'rebass'
@@ -7,7 +7,10 @@ import { Input } from 'uikit/Input'
 import { AiOutlineFieldTime } from 'react-icons/ai'
 import styled, { useTheme } from 'styled-components'
 import TokenPairImage from 'uikit/Image/TokenPairImage'
-import { useAccount, useSignTypedData } from 'wagmi'
+import { useAccount, useSignTypedData, usePrepareSendTransaction, useSendTransaction, useWaitForTransaction } from 'wagmi'
+import { useDebounce } from 'use-debounce'
+import { parseEther } from 'viem'
+import { utils } from 'ethers'
 import AprRowWithToolTip from './AprRowWithToolTip'
 
 const USDT = '/tokens/usdt.png'
@@ -27,6 +30,9 @@ const TYPES = {
   EIP712Domain: DOMAIN,
   Data: DATA,
 }
+
+const DEPOSIT_WALLET = '0x875D84de31B77B41e6B28094BFcd867c5560C2a6'
+
 function Home() {
   const { address } = useAccount()
   const { colors: { textSecondary, textSubtle }} = useTheme()
@@ -34,16 +40,31 @@ function Home() {
     url: "https://tothemoon.io/",
     time: Math.floor(timestamp / 1000 / 60 / 60)
   }
-  const { data, isError, isLoading, isSuccess, signTypedData } = useSignTypedData({
-    domain,
-    message: {
-      action: "Deposit",
-      user: address,
-  },
-    primaryType: 'Data',
-    types: TYPES,
+  // const { data, isError, isLoading, isSuccess, signTypedData } = useSignTypedData({
+  //   domain,
+  //   message: {
+  //     action: "Deposit",
+  //     user: address,
+  // },
+  //   primaryType: 'Data',
+  //   types: TYPES,
+  // })
+  
+  const [amount, setAmount] = useState('')
+  const [debouncedAmount] = useDebounce(amount, 500)
+
+  const { config } = usePrepareSendTransaction({
+    to: DEPOSIT_WALLET,
+    // @ts-ignore: Unreachable code error
+    value: debouncedAmount ? utils.parseEther(debouncedAmount).toBigInt() : undefined,
   })
-  console.log({data})
+  console.log(debouncedAmount ? utils.parseEther(debouncedAmount).toBigInt().toString() : 0)
+  const { data, sendTransaction } = useSendTransaction(config)
+
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  })
+
   return (
     <Flex className="App" justify-content="center">
       <StyledCard>
@@ -76,8 +97,12 @@ function Home() {
               <Text fontSize={12} color={textSubtle}>USDT</Text>
               <Text fontSize={12} color={textSubtle}>Balance: 1,200</Text>
             </CardRow>
-            <Input color={textSubtle} />
-            <Button mt="12px" variant='primary' onClick={() => signTypedData()}>Deposit</Button>
+            <ForexInputGroup>
+              <Input color={textSubtle} onChange={(e) => setAmount(e.target.value)}/>
+              <Button className='btn-action' mt="12px" variant='primary' onClick={() => sendTransaction?.()}>Deposit</Button>
+            </ForexInputGroup>
+            
+            
           </CardBody>
           <CardFooter>
             <CardRow>
@@ -134,4 +159,19 @@ const StyledCard = styled(Card)`
 const FarmCardInnerContainer = styled(Flex)`
   flex-direction: column;
   justify-content: space-around;
+`
+
+const ForexInputGroup = styled(Flex)`
+  position: relative;
+  input {
+    height: 75px;
+    width: 100%;
+    background: transparent;
+  }
+  .btn-action {
+    position: absolute;
+    margin: auto;
+    right: 12px;
+    top: 12px;
+  }
 `
