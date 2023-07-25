@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Card } from 'uikit/Card'
 import { Flex } from 'uikit/Box'
 import { Text } from 'rebass'
@@ -7,9 +7,12 @@ import { Input } from 'uikit/Input'
 import { AiOutlineFieldTime } from 'react-icons/ai'
 import styled, { useTheme } from 'styled-components'
 import TokenPairImage from 'uikit/Image/TokenPairImage'
-import { useAccount, useSignTypedData, usePrepareSendTransaction, useSendTransaction, useWaitForTransaction } from 'wagmi'
+import AutoRenewIcon from 'uikit/Icons/AutoRenew'
+import { useAccount, useNetwork, usePrepareContractWrite, useWaitForTransaction, useContractWrite } from 'wagmi'
+import { usdt } from 'config/token'
+import ERC20Abi from 'config/abi/erc20.json'
+
 import { useDebounce } from 'use-debounce'
-import { parseEther } from 'viem'
 import { utils } from 'ethers'
 import AprRowWithToolTip from './AprRowWithToolTip'
 
@@ -31,10 +34,12 @@ const TYPES = {
   Data: DATA,
 }
 
-const DEPOSIT_WALLET = '0x875D84de31B77B41e6B28094BFcd867c5560C2a6'
+const DEPOSIT_WALLET = '0x67668dcf335ba40dc14df836a9942b3d47205dec'
+const spinnerIcon = <AutoRenewIcon spin color="currentColor" />
 
 function Home() {
   const { address } = useAccount()
+  const { chain } = useNetwork()
   const { colors: { textSecondary, textSubtle }} = useTheme()
   const domain: any = {
     url: "https://tothemoon.io/",
@@ -53,18 +58,17 @@ function Home() {
   const [amount, setAmount] = useState('')
   const [debouncedAmount] = useDebounce(amount, 500)
 
-  const { config } = usePrepareSendTransaction({
-    to: DEPOSIT_WALLET,
-    // @ts-ignore: Unreachable code error
-    value: debouncedAmount ? utils.parseEther(debouncedAmount).toBigInt() : undefined,
+  const { config } = usePrepareContractWrite({
+    address: usdt[chain?.id || 56],
+    abi: ERC20Abi,
+    functionName: 'transfer',
+    args: [DEPOSIT_WALLET, utils.parseEther(debouncedAmount || '0')]
   })
-  console.log(debouncedAmount ? utils.parseEther(debouncedAmount).toBigInt().toString() : 0)
-  const { data, sendTransaction } = useSendTransaction(config)
+  const { data, isLoading: isWalletLoading, write: deposit } = useContractWrite(config)
 
-  const { isLoading, isSuccess } = useWaitForTransaction({
+  const { isError, isLoading: isDepositing } = useWaitForTransaction({
     hash: data?.hash,
   })
-
   return (
     <Flex className="App" justify-content="center">
       <StyledCard>
@@ -99,7 +103,16 @@ function Home() {
             </CardRow>
             <ForexInputGroup>
               <Input color={textSubtle} onChange={(e) => setAmount(e.target.value)}/>
-              <Button className='btn-action' mt="12px" variant='primary' onClick={() => sendTransaction?.()}>Deposit</Button>
+              <Button
+                isLoading={isDepositing || isWalletLoading}
+                disabled={!deposit}
+                className='btn-action'
+                mt="12px"
+                variant='primary'
+                onClick={() => deposit?.()}
+                endIcon={(isDepositing || isWalletLoading) ? spinnerIcon : undefined}
+              >Deposit
+              </Button>
             </ForexInputGroup>
             
             
