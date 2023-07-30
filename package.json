@@ -24,6 +24,7 @@
     "react-popper": "^2.3.0",
     "react-router-dom": "^6.11.2",
     "react-scripts": "5.0.1",
+    "react-transition-group": "^4.4.5",
     "rebass": "^4.0.7",
     "recharts": "^2.6.2",
     "styled-components": "^5.3.11",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.195",
+    "@types/react-transition-group": "^4.4.6",
     "@types/rebass": "^4.0.10",
     "@types/styled-components": "^5.1.26",
     "@types/styled-system": "^5.1.16"

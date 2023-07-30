@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card } from 'uikit/Card'
 import { Flex } from 'uikit/Box'
 import { Text } from 'rebass'
@@ -11,7 +11,7 @@ import AutoRenewIcon from 'uikit/Icons/AutoRenew'
 import { useAccount, useNetwork, usePrepareContractWrite, useWaitForTransaction, useContractWrite } from 'wagmi'
 import { usdt } from 'config/token'
 import ERC20Abi from 'config/abi/erc20.json'
-
+import { useToast } from 'contexts/ToastsContext/useToast'
 import { useDebounce } from 'use-debounce'
 import { utils } from 'ethers'
 import AprRowWithToolTip from './AprRowWithToolTip'
@@ -38,6 +38,7 @@ const DEPOSIT_WALLET = '0x67668dcf335ba40dc14df836a9942b3d47205dec'
 const spinnerIcon = <AutoRenewIcon spin color="currentColor" />
 
 function Home() {
+  const { toastSuccess, toastError } = useToast()
   const { address } = useAccount()
   const { chain } = useNetwork()
   const { colors: { textSecondary, textSubtle }} = useTheme()
@@ -58,17 +59,27 @@ function Home() {
   const [amount, setAmount] = useState('')
   const [debouncedAmount] = useDebounce(amount, 500)
 
-  const { config } = usePrepareContractWrite({
+  const { config, error } = usePrepareContractWrite({
     address: usdt[chain?.id || 56],
     abi: ERC20Abi,
     functionName: 'transfer',
     args: [DEPOSIT_WALLET, utils.parseEther(debouncedAmount || '0')]
   })
-  const { data, isLoading: isWalletLoading, write: deposit } = useContractWrite(config)
-
-  const { isError, isLoading: isDepositing } = useWaitForTransaction({
+  const { data, isLoading: isWalletLoading, write: deposit, error: depositWriteError } = useContractWrite(config)
+  const { isError, isLoading: isDepositing, status: depositTxStatus, data: depositTx } = useWaitForTransaction({
     hash: data?.hash,
   })
+  
+  useEffect(() => {
+    if (depositTxStatus === 'success') {
+      toastSuccess('Deposited successfully', depositTx?.blockHash)
+    }
+    if (depositTxStatus === 'error') {
+      toastError('Deposited error', depositTx?.blockHash)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [depositTxStatus, depositTx])
+
   return (
     <Flex className="App" justify-content="center">
       <StyledCard>
@@ -111,10 +122,11 @@ function Home() {
                 variant='primary'
                 onClick={() => deposit?.()}
                 endIcon={(isDepositing || isWalletLoading) ? spinnerIcon : undefined}
-              >Deposit
+              >
+                Deposit
               </Button>
             </ForexInputGroup>
-            
+            <Text fontSize={12} color={textSubtle}>{error?.message || depositWriteError?.message}</Text>
             
           </CardBody>
           <CardFooter>
