@@ -63,11 +63,13 @@ function Home() {
     address: usdt[chain?.id || 56],
     abi: ERC20Abi,
     functionName: 'transfer',
-    args: [DEPOSIT_WALLET, utils.parseEther(debouncedAmount || '0')]
+    args: [DEPOSIT_WALLET, utils.parseEther(debouncedAmount || '0')],
+    chainId: 97
   })
   const { data, isLoading: isWalletLoading, write: deposit, error: depositWriteError } = useContractWrite(config)
   const { isError, isLoading: isDepositing, status: depositTxStatus, data: depositTx } = useWaitForTransaction({
     hash: data?.hash,
+    chainId: 97
   })
   
   useEffect(() => {
