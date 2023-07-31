@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { PolymorphicComponent } from "../../util/polymorphic";
+import { PolymorphicComponent } from "../../utils/polymorphic";
 import Button from "./Button";
 import { BaseButtonProps } from "./types";
 

@@ -4,8 +4,8 @@ import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { isMobile } from "react-device-detect";
 import { ThemeProvider, useTheme } from "styled-components";
-import getPortalRoot from "../../util/getPortalRoot";
-import isTouchDevice from "../../util/isTouchDevice";
+import getPortalRoot from "../../utils/getPortalRoot";
+import isTouchDevice from "../../utils/isTouchDevice";
 import { Arrow, StyledTooltip } from "./StyledTooltip";
 import { TooltipOptions, TooltipRefs } from "./types";
 

@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react'
 import { Card } from 'uikit/Card'
-import { Flex } from 'uikit/Box'
+import { Flex, Box } from 'uikit/Box'
 import { Text } from 'rebass'
 import Button from 'uikit/Button'
 import { Input } from 'uikit/Input'
+import { Balance } from 'uikit/Balance'
 import { AiOutlineFieldTime } from 'react-icons/ai'
 import styled, { useTheme } from 'styled-components'
 import TokenPairImage from 'uikit/Image/TokenPairImage'
+import TokenImage from 'uikit/Image/TokenImage'
 import AutoRenewIcon from 'uikit/Icons/AutoRenew'
-import { useAccount, useNetwork, usePrepareContractWrite, useWaitForTransaction, useContractWrite } from 'wagmi'
+import { useAccount, useNetwork, usePrepareContractWrite, useWaitForTransaction, useContractWrite, useBalance } from 'wagmi'
 import { usdt } from 'config/token'
 import ERC20Abi from 'config/abi/erc20.json'
 import { useToast } from 'contexts/ToastsContext/useToast'
 import { useDebounce } from 'use-debounce'
 import { utils } from 'ethers'
+import { formatBigInt } from 'utils/formatBalance'
 import AprRowWithToolTip from './AprRowWithToolTip'
 
 const USDT = '/tokens/usdt.png'
@@ -42,6 +45,11 @@ function Home() {
   const { address } = useAccount()
   const { chain } = useNetwork()
   const { colors: { textSecondary, textSubtle }} = useTheme()
+  const usdtAddress = usdt[chain?.id || 56]
+  const { data: usdtBalance, isLoading: isBalanceLoading } = useBalance({
+    address,
+    token: usdtAddress
+  })
   const domain: any = {
     url: "https://tothemoon.io/",
     time: Math.floor(timestamp / 1000 / 60 / 60)
@@ -60,7 +68,7 @@ function Home() {
   const [debouncedAmount] = useDebounce(amount, 500)
 
   const { config, error } = usePrepareContractWrite({
-    address: usdt[chain?.id || 56],
+    address: usdtAddress,
     abi: ERC20Abi,
     functionName: 'transfer',
     args: [DEPOSIT_WALLET, utils.parseEther(debouncedAmount || '0')],
@@ -71,7 +79,7 @@ function Home() {
     hash: data?.hash,
     chainId: 97
   })
-  
+  console.log({usdtBalance})
   useEffect(() => {
     if (depositTxStatus === 'success') {
       toastSuccess('Deposited successfully', depositTx?.blockHash)
@@ -101,14 +109,18 @@ function Home() {
             <CardRow mt="24px">
               <Text fontSize={12} fontWeight='bold' color={textSubtle}>
                 USDT&nbsp; 
-                <span style={{ color: textSecondary }}>EARNED</span>
+                <span style={{ color: textSecondary }}>Onchain</span>
               </Text>
+              <Flex alignItems="center">
+                <Box width="32px"><TokenImage src={USDT} height={24} width={24} /></Box>
+                <Balance fontSize={20} fontWeight={600} color={textSubtle} value={Number(formatBigInt(usdtBalance?.value as any || BigInt(0), 3, usdtBalance?.decimals)) || 0} decimals={2} />
+              </Flex>
             </CardRow>
-            <CardRow mb="16px">
+            <CardRow mb="16px" mt="24px">
               <Text fontSize={20} fontWeight={600} color={textSubtle}>
                 5,000 ~USD
               </Text>
-              <Button variant='secondary'>Compound</Button>
+              <Button variant='secondary'>Invest</Button>
             </CardRow>
             <CardRow mb="4px">
               <Text fontSize={12} color={textSubtle}>USDT</Text>
