@@ -46,7 +46,7 @@ function Home() {
   const { chain } = useNetwork()
   const { colors: { textSecondary, textSubtle }} = useTheme()
   const usdtAddress = usdt[chain?.id || 56]
-  const { data: usdtBalance, isLoading: isBalanceLoading } = useBalance({
+  const { data: usdtBalance } = useBalance({
     address,
     token: usdtAddress
   })
@@ -72,14 +72,12 @@ function Home() {
     abi: ERC20Abi,
     functionName: 'transfer',
     args: [DEPOSIT_WALLET, utils.parseEther(debouncedAmount || '0')],
-    chainId: 97
   })
   const { data, isLoading: isWalletLoading, write: deposit, error: depositWriteError } = useContractWrite(config)
-  const { isError, isLoading: isDepositing, status: depositTxStatus, data: depositTx } = useWaitForTransaction({
+  const { isLoading: isDepositing, status: depositTxStatus, data: depositTx } = useWaitForTransaction({
     hash: data?.hash,
-    chainId: 97
   })
-  console.log({usdtBalance})
+  // console.log({usdtBalance, depositWriteError, error, usdtAddress}, chain?.id)
   useEffect(() => {
     if (depositTxStatus === 'success') {
       toastSuccess('Deposited successfully', depositTx?.blockHash)
