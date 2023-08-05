@@ -64,9 +64,9 @@ function Home() {
   //   types: TYPES,
   // })
   
-  const [amount, setAmount] = useState('')
+  const [amount, setAmount] = useState('0')
   const [debouncedAmount] = useDebounce(amount, 500)
-
+  console.log(utils.parseEther(debouncedAmount || '0'))
   const { config, error } = usePrepareContractWrite({
     address: usdtAddress,
     abi: ERC20Abi,

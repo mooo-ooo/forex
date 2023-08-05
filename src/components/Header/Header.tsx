@@ -1,13 +1,20 @@
+import { useState } from 'react'
 import styled, { useTheme } from "styled-components"
+import Modal from 'react-modal';
 import Logo from 'uikit/Icons/Logo'
-import { Flex } from 'uikit/Box'
+import { Flex, Box } from 'uikit/Box'
 import Button from "uikit/Button"
+import { MdLogout } from 'react-icons/md'
+import { BiMoneyWithdraw } from 'react-icons/bi'
 import { UserMenuItemProps } from "./types";
 import { FiChevronDown } from 'react-icons/fi'
 import { IoWalletOutline } from 'react-icons/io5'
 import Container from 'components/Layout/Container'
+import { Dropdown } from 'uikit/Dropdown'
+import Withdraw from 'components/Withdraw';
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
+import MenuButton from "./MenuButton";
 
 function Header() {
   const { address } = useAccount()
@@ -17,6 +24,8 @@ function Header() {
   const theme = useTheme()
   const { disconnect } = useDisconnect()
   const accountEllipsis = address ? `${address.substring(0, 2)}...${address.substring(address.length - 4)}` : undefined;
+  const [modalIsOpen, setIsOpen] = useState(false);
+
   return (
     <HeaderStyled>
       <Container width='100%'>
@@ -24,21 +33,72 @@ function Header() {
           <Logo />
           <div>
             {address ?
-              <StyledUserMenu>
-                <IoWalletOutline fontSize={24} color={theme.colors.text} />
-                <LabelText title={address}>
-                  {accountEllipsis}
-                </LabelText>
-                <FiChevronDown color={theme.colors.text} />
-              </StyledUserMenu>
+              <Dropdown
+                target={
+                  <StyledUserMenu>
+                    <IoWalletOutline fontSize={24} color={theme.colors.text} />
+                    <LabelText title={address}>
+                      {accountEllipsis}
+                    </LabelText>
+                    <FiChevronDown color={theme.colors.text} />
+                  </StyledUserMenu>
+                }
+              >
+                <MenuButton
+                  key="withdraw"
+                  fullWidth
+                  onClick={() => setIsOpen(true)}
+                  style={{ minHeight: "32px", height: "auto" }}
+                >
+                  <Flex alignItems="center" justifyContent="space-between" width="100%" style={{ gap: 32 }}>
+                    Withdraw
+                    <BiMoneyWithdraw />
+                  </Flex>
+                </MenuButton>
+                <UserMenuDivider />
+                <MenuButton
+                  key="disconnect"
+                  fullWidth
+                  onClick={() => disconnect()}
+                  style={{ minHeight: "32px", height: "auto" }}
+                >
+                  <Flex alignItems="center" justifyContent="space-between" width="100%" style={{ gap: 32 }}>
+                    Disconnect
+                    <MdLogout />
+                  </Flex>
+                </MenuButton>
+              </Dropdown>
               : <Button onClick={() => connect()} scale="sm">Connect</Button>
             }
           </div>
         </Flex>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={() => setIsOpen(false)}
+          style={customStyles}
+          contentLabel="Example Modal"
+        ><Withdraw /></Modal>
       </Container>
     </HeaderStyled>
   );
 }
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    background: "#272628",
+    borderRadius: 32,
+  },
+  overlay: {
+    zIndex: 999,
+    background: "#f4eeff99"
+  }
+};
 
 const HeaderStyled = styled.nav`
   position: sticky;
