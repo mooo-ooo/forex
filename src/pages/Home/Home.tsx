@@ -20,22 +20,6 @@ import { formatBigInt, isNumeric } from 'utils/formatBalance'
 import AprRowWithToolTip from './AprRowWithToolTip'
 
 const USDT = '/tokens/usdt.png'
-const timestamp = new Date().valueOf()
-
-const DOMAIN = [
-  {name: "url", type: "string"},
-  {name: "time", type: "uint256"},
-];
-
-const DATA = [
-  {name: "action", type: "string"},
-  {name: "user", type: "address"},
-];
-
-const TYPES = {
-  EIP712Domain: DOMAIN,
-  Data: DATA,
-}
 
 const DEPOSIT_WALLET = '0x67668dcf335ba40dc14df836a9942b3d47205dec'
 const spinnerIcon = <AutoRenewIcon spin color="currentColor" />
@@ -48,21 +32,9 @@ function Home() {
   const usdtAddress = usdt[chain?.id || 56]
   const { data: usdtBalance } = useBalance({
     address,
-    token: usdtAddress
+    token: usdtAddress,
+    watch: true
   })
-  const domain: any = {
-    url: "https://tothemoon.io/",
-    time: Math.floor(timestamp / 1000 / 60 / 60)
-  }
-  // const { data, isError, isLoading, isSuccess, signTypedData } = useSignTypedData({
-  //   domain,
-  //   message: {
-  //     action: "Deposit",
-  //     user: address,
-  // },
-  //   primaryType: 'Data',
-  //   types: TYPES,
-  // })
   
   const [amount, setAmount] = useState('')
   const [debouncedAmount] = useDebounce(isNumeric(amount) ? amount : '0' , 500)
@@ -85,16 +57,14 @@ function Home() {
     if (depositTxStatus === 'error') {
       toastError('Deposited error', depositTx?.blockHash)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [depositTxStatus, depositTx])
+  }, [depositTxStatus, depositTx, toastError, toastSuccess])
 
   useEffect(() => {
     if (depositWriteError) {
       console.log({depositWriteError})
       toastError('Deposited error', (depositWriteError as any)?.details)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [depositWriteError])
+  }, [depositWriteError, toastError])
 
   return (
     <Flex className="App" justify-content="center">
@@ -133,7 +103,7 @@ function Home() {
               <Text fontSize={12} color={textSubtle}>Balance: 1,200</Text>
             </CardRow>
             <ForexInputGroup>
-              <Input color={textSubtle} onChange={(e) => setAmount(e.target.value)}/>
+              <Input color={textSubtle} type="number" onChange={(e) => setAmount(e.target.value)}/>
               <Button
                 isLoading={isDepositing || isWalletLoading}
                 disabled={!deposit}

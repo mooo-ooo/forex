@@ -6,7 +6,7 @@ const EagerConnectionWrapper = ({
 }: {
   children: ReactNode;
 }) => {
-  const { connect, connectors, pendingConnector } = useConnect();
+  const { connect, connectors } = useConnect();
   const { isDisconnected } = useAccount();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const EagerConnectionWrapper = ({
 
     if (!isWagmiConnected) return;
     connect({ connector: connectors[0] });
-  }, [connect, connectors]);
+  }, [connect, connectors, isDisconnected]);
 
   return <>{children}</>;
 };

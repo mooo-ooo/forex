@@ -2,7 +2,7 @@ import { useState } from 'react'
 import styled, { useTheme } from "styled-components"
 import Modal from 'react-modal';
 import Logo from 'uikit/Icons/Logo'
-import { Flex, Box } from 'uikit/Box'
+import { Flex } from 'uikit/Box'
 import Button from "uikit/Button"
 import { MdLogout } from 'react-icons/md'
 import { BiMoneyWithdraw } from 'react-icons/bi'
@@ -34,6 +34,7 @@ function Header() {
           <div>
             {address ?
               <Dropdown
+                // position='top-right'
                 target={
                   <StyledUserMenu>
                     <IoWalletOutline fontSize={24} color={theme.colors.text} />
@@ -93,10 +94,12 @@ const customStyles = {
     transform: 'translate(-50%, -50%)',
     background: "#272628",
     borderRadius: 32,
+    padding: 0,
+    minWidth: 350
   },
   overlay: {
     zIndex: 999,
-    background: "#f4eeff99"
+    background: "#f4eeff99",
   }
 };
 

@@ -1,13 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { DropdownProps, PositionProps, Position } from "./types";
-
-const getLeft = ({ position }: PositionProps) => {
-  if (position === "top-right") {
-    return "100%";
-  }
-  return "50%";
-};
 
 const getBottom = ({ position }: PositionProps) => {
   if (position === "top" || position === "top-right") {
@@ -21,8 +14,7 @@ const DropdownContent = styled.div<{ position: Position }>`
   display: flex;
   flex-direction: column;
   position: absolute;
-  transform: translate(-50%, 0);
-  left: ${getLeft};
+  right: 0px;
   bottom: ${getBottom};
   background-color: ${({ theme }) => theme.colors.backgroundAlt};
   box-shadow: ${({ theme }) => theme.shadows.level1};
@@ -53,7 +45,7 @@ const Container = styled.div<{ $scrolling: boolean }>`
 `;
 
 const Dropdown: React.FC<React.PropsWithChildren<DropdownProps>> = ({ target, position = "bottom", children }) => {
-  const [scrolling, setScrolling] = useState(false);
+  const [scrolling] = useState(false);
 
   return (
     <Container $scrolling={scrolling}>
