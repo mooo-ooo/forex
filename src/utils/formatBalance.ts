@@ -20,3 +20,5 @@ export const formatBigInt = (value: bigint, displayDecimals = 18, decimals = 18)
   const formatted = formatUnits(value - remainder, decimals)
   return formatted
 }
+
+export const isNumeric = (num: any) => (typeof(num) === 'number' || typeof(num) === "string" && num.trim() !== '') && !isNaN(num as number);

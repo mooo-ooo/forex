@@ -15,8 +15,8 @@ import { usdt } from 'config/token'
 import ERC20Abi from 'config/abi/erc20.json'
 import { useToast } from 'contexts/ToastsContext/useToast'
 import { useDebounce } from 'use-debounce'
-import { utils } from 'ethers'
-import { formatBigInt } from 'utils/formatBalance'
+import { parseEther } from 'viem'
+import { formatBigInt, isNumeric } from 'utils/formatBalance'
 import AprRowWithToolTip from './AprRowWithToolTip'
 
 const USDT = '/tokens/usdt.png'
@@ -64,20 +64,20 @@ function Home() {
   //   types: TYPES,
   // })
   
-  const [amount, setAmount] = useState('0')
-  const [debouncedAmount] = useDebounce(amount, 500)
-  console.log(utils.parseEther(debouncedAmount || '0'))
+  const [amount, setAmount] = useState('')
+  const [debouncedAmount] = useDebounce(isNumeric(amount) ? amount : '0' , 500)
+
   const { config, error } = usePrepareContractWrite({
     address: usdtAddress,
     abi: ERC20Abi,
     functionName: 'transfer',
-    args: [DEPOSIT_WALLET, utils.parseEther(debouncedAmount || '0')],
+    args: [DEPOSIT_WALLET, parseEther(debouncedAmount as `${number}`)],
   })
   const { data, isLoading: isWalletLoading, write: deposit, error: depositWriteError } = useContractWrite(config)
   const { isLoading: isDepositing, status: depositTxStatus, data: depositTx } = useWaitForTransaction({
     hash: data?.hash,
   })
-  // console.log({usdtBalance, depositWriteError, error, usdtAddress}, chain?.id)
+
   useEffect(() => {
     if (depositTxStatus === 'success') {
       toastSuccess('Deposited successfully', depositTx?.blockHash)
@@ -87,6 +87,14 @@ function Home() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [depositTxStatus, depositTx])
+
+  useEffect(() => {
+    if (depositWriteError) {
+      console.log({depositWriteError})
+      toastError('Deposited error', (depositWriteError as any)?.details)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [depositWriteError])
 
   return (
     <Flex className="App" justify-content="center">
@@ -138,7 +146,7 @@ function Home() {
                 Deposit
               </Button>
             </ForexInputGroup>
-            <Text fontSize={12} color={textSubtle}>{error?.message || depositWriteError?.message}</Text>
+            <Text fontSize={12} color={textSubtle}>{error?.message}</Text>
             
           </CardBody>
           <CardFooter>
