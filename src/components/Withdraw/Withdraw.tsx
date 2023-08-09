@@ -12,14 +12,14 @@ import AutoRenewIcon from 'uikit/Icons/AutoRenew'
 const timestamp = new Date().valueOf()
 
 const DOMAIN = [
-  {name: "url", type: "string"},
-  {name: "time", type: "uint256"},
+  { name: "url", type: "string" },
+  { name: "time", type: "uint256" },
 ];
 
 const DATA = [
-  {name: "action", type: "string"},
-  {name: "user", type: "address"},
-  {name: "amount", type: "string"}
+  { name: "request_type", type: "string" },
+  { name: "address", type: "address" },
+  { name: "value", type: "string" }
 ];
 
 const TYPES = {
@@ -32,23 +32,26 @@ const spinnerIcon = <AutoRenewIcon spin color="currentColor" />
 const Withdraw = () => {
   const { toastSuccess, toastError } = useToast()
   const { address } = useAccount()
-  const { colors: { textSecondary, gradientBubblegum, textSubtle }} = useTheme()
-  const [amount, setAmount] = useState('')
+  const { colors: { textSecondary, gradientBubblegum, textSubtle } } = useTheme()
+  const [value, setAmount] = useState('')
 
   const domain: any = {
-    url: "https://tothemoon.io/",
-    time: Math.floor(timestamp / 1000 / 60 / 60)
+    url: "tothemoon.io",
+    time: Math.floor(timestamp / 1000 / 60 / 60),
+    // time: 111
   }
   const { data: signature, isLoading, isSuccess, signTypedData, error } = useSignTypedData({
     domain,
     message: {
-      action: "WIT",
-      user: address,
-      amount
-  },
+      request_type: 'U_WITHDRAWAL',
+      address,
+      value
+    },
     primaryType: 'Data',
     types: TYPES,
   })
+
+  console.log(',,,domain', domain);
 
   useEffect(() => {
     if (error) {
@@ -56,9 +59,18 @@ const Withdraw = () => {
     }
   }, [error, toastError])
 
-  const withdraw = () => http.post('/v1/user-reward/claim', {
-    signature, amount, address
-  })
+  const withdraw = () => {
+    const data = {
+      signature,
+      payload: {
+        request_type: 'U_WITHDRAWAL',
+        address,
+        value
+      }
+    };
+    console.log(data);
+    return http.post('/v1/port/action', data);
+  }
 
   useEffect(() => {
     if (signature) {
@@ -66,10 +78,10 @@ const Withdraw = () => {
         .then(() => toastSuccess('Wit done'))
         .catch(err => toastError(err.message))
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature])
 
-  console.log({signature, error, isSuccess})
+  console.log({ signature, error, isSuccess })
 
   return (
     <Box>
@@ -80,8 +92,8 @@ const Withdraw = () => {
         <Text fontSize={14} color={textSubtle}>Enter amount</Text>
         <InputStyled
           color={textSubtle}
-          id='amount'
-          name='amount'
+          id='value'
+          name='value'
           type='number'
           placeholder='0'
           onChange={(event) => setAmount(event.target.value)}
@@ -89,7 +101,7 @@ const Withdraw = () => {
         <Button
           mt="24px"
           isLoading={isLoading}
-          disabled={Number(amount) < 0}
+          disabled={Number(value) < 0}
           className='btn-action'
           variant='primary'
           onClick={() => signTypedData?.()}
