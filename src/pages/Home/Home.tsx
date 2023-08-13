@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import BigNumber from "bignumber.js";
 import { Card } from 'uikit/Card'
 import { Flex, Box } from 'uikit/Box'
 import { Text } from 'rebass'
@@ -16,6 +17,7 @@ import ERC20Abi from 'config/abi/erc20.json'
 import { useToast } from 'contexts/ToastsContext/useToast'
 import { useDebounce } from 'use-debounce'
 import { parseEther } from 'viem'
+import { RoiCalculator } from 'uikit/RoiCalculatorModal/'
 import { formatBigInt, isNumeric } from 'utils/formatBalance'
 import AprRowWithToolTip from './AprRowWithToolTip'
 
@@ -66,8 +68,10 @@ function Home() {
     }
   }, [depositWriteError, toastError])
 
+  const onChainBalanceDec = Number(formatBigInt(usdtBalance?.value as any || BigInt(0), 3, usdtBalance?.decimals))
+
   return (
-    <Flex className="App" justify-content="center">
+    <Flex className="App" justify-content="center" flexDirection="column">
       <StyledCard>
         <FarmCardInnerContainer>
           <CardHeader justifyContent="space-between">
@@ -89,7 +93,7 @@ function Home() {
               </Text>
               <Flex alignItems="center">
                 <Box width="32px"><TokenImage src={USDT} height={24} width={24} /></Box>
-                <Balance fontSize={20} fontWeight={600} color={textSubtle} value={Number(formatBigInt(usdtBalance?.value as any || BigInt(0), 3, usdtBalance?.decimals)) || 0} decimals={2} />
+                <Balance fontSize={20} fontWeight={600} color={textSubtle} value={onChainBalanceDec || 0} decimals={2} />
               </Flex>
             </CardRow>
             <CardRow mb="16px" mt="24px">
@@ -131,11 +135,39 @@ function Home() {
           </CardFooter>
         </FarmCardInnerContainer>
       </StyledCard>
+      <ROIStyled>
+        <RoiCalculator
+          account={address as string}
+          earningTokenPrice={1}
+          apr={80}
+          linkLabel="USDT Contract"
+          linkHref="https://bscscan.com/address/0x55d398326f99059ff775485246999027b3197955#code"
+          stakingTokenBalance={new BigNumber(onChainBalanceDec)}
+          stakingTokenDecimals={2}
+          stakingTokenSymbol="USDT"
+          stakingTokenPrice={1}
+          earningTokenSymbol="USDT"
+        />
+      </ROIStyled>
+      
     </Flex>
   );
 }
 
 export default Home;
+
+const ROIStyled = styled(Card)`
+  align-self: baseline;
+  padding: 16px;
+  max-width: 100%;
+  margin: 0 0 24px 0;
+  width: 350px;
+  text-align: left;
+  ${({ theme }) => theme.mediaQueries.sm} {
+    max-width: 350px;
+    margin: 0 12px 46px;
+  }
+`
 
 const CardBody = styled(Flex)`
   padding: 16px;
