@@ -8,6 +8,7 @@ import { Input } from 'uikit/Input'
 import { Balance } from 'uikit/Balance'
 import { AiOutlineFieldTime } from 'react-icons/ai'
 import styled, { useTheme } from 'styled-components'
+import LineChart from 'uikit/LineChart/LineChart';
 import TokenPairImage from 'uikit/Image/TokenPairImage'
 import TokenImage from 'uikit/Image/TokenImage'
 import AutoRenewIcon from 'uikit/Icons/AutoRenew'
@@ -72,6 +73,32 @@ function Home() {
 
   return (
     <Flex className="App" justify-content="center" flexDirection="column">
+      <LineChart
+        data={[
+          {
+            time: new Date('Fri Aug 18 2023'),
+            value: 2
+          },
+          {
+            time: new Date('Fri Aug 19 2023'),
+            value: 7
+          },
+          {
+            time: new Date('Fri Aug 20 2023'),
+            value: 12
+          },
+          {
+            time: new Date('Fri Aug 21 2023'),
+            value: 37
+          }
+        ]}
+        color='#9A6AFF'
+        minHeight={340}
+        value={5}
+        label='test'
+        // setValue={setLatestValue}
+        // setLabel={setValueLabel}
+      />
       <StyledCard>
         <FarmCardInnerContainer>
           <CardHeader justifyContent="space-between">
