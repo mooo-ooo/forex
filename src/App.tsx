@@ -13,7 +13,7 @@ import { bsc, bscTestnet } from 'wagmi/chains'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
-// import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { PUBLIC_NODES } from 'config/nodes'
 import { ThemeProvider } from 'styled-components'
 import theme from 'theme'
@@ -70,13 +70,13 @@ export const injectedConnector = new InjectedConnector({
   },
 })
 
-// export const walletConnectConnector = new WalletConnectConnector({
-//   chains,
-//   options: {
-//     showQrModal: true,
-//     projectId: 'e542ff314e26ff34de2d4fba98db70bb',
-//   },
-// })
+export const walletConnectConnector = new WalletConnectConnector({
+  chains,
+  options: {
+    showQrModal: true,
+    projectId: 'e542ff314e26ff34de2d4fba98db70bb',
+  },
+})
 
 const config = createConfig({
   storage: createStorage({
@@ -85,6 +85,7 @@ const config = createConfig({
   }),
   autoConnect: false,
   connectors: [
+    walletConnectConnector,
     metaMaskConnector,
     injectedConnector
   ],

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import styled, { useTheme } from "styled-components"
 import Modal from 'react-modal';
 import Logo from 'uikit/Icons/Logo'
-import { Flex } from 'uikit/Box'
+import { Flex, Box } from 'uikit/Box'
 import Button from "uikit/Button"
 import { MdLogout } from 'react-icons/md'
 import { BiMoneyWithdraw } from 'react-icons/bi'
@@ -18,14 +18,15 @@ import MenuButton from "./MenuButton";
 
 function Header() {
   const { address } = useAccount()
-  const { connect } = useConnect({
+  const { connect, connectors, isLoading, pendingConnector, error } = useConnect({
     connector: new InjectedConnector(),
   })
   const theme = useTheme()
   const { disconnect } = useDisconnect()
   const accountEllipsis = address ? `${address.substring(0, 2)}...${address.substring(address.length - 4)}` : undefined;
   const [modalIsOpen, setIsOpen] = useState(false);
-
+  const [walletModalIsOpen, setWalletModalIsOpen] = useState(false);
+  console.log({connectors})
   return (
     <HeaderStyled>
       <Container width='100%'>
@@ -69,16 +70,44 @@ function Header() {
                   </Flex>
                 </MenuButton>
               </Dropdown>
-              : <Button onClick={() => connect()} scale="sm">Connect</Button>
+              : <Button onClick={() => setWalletModalIsOpen(true)} scale="sm">Connect</Button>
             }
           </div>
         </Flex>
+        
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={() => setIsOpen(false)}
           style={customStyles}
           contentLabel="Example Modal"
-        ><Withdraw /></Modal>
+        >
+          <Withdraw />
+        </Modal>
+
+        <Modal
+          isOpen={walletModalIsOpen}
+          onRequestClose={() => setWalletModalIsOpen(false)}
+          style={customStyles}
+          contentLabel="Example Modal"
+        >
+          <WalletContent flexDirection="column" p="24px">
+            {connectors.map((connector) => (
+              <button
+                disabled={!connector.ready}
+                key={connector.id}
+                onClick={() => connect({ connector })}
+              >
+                {connector.name}
+                {!connector.ready && ' (unsupported)'}
+                {isLoading &&
+                  connector.id === pendingConnector?.id &&
+                  ' (connecting)'}
+              </button>
+            ))}
+      
+            {error && <div>{error.message}</div>}
+          </WalletContent>
+        </Modal>
       </Container>
     </HeaderStyled>
   );
@@ -102,6 +131,10 @@ const customStyles = {
     background: "#f4eeff99",
   }
 };
+
+const WalletContent = styled(Flex)`
+  padding: 24px;
+`
 
 const HeaderStyled = styled.nav`
   position: sticky;
