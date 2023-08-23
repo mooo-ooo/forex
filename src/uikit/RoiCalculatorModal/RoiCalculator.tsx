@@ -31,7 +31,7 @@ export const ScrollableContainer = styled.div`
 
 const FullWidthButtonMenu = styled(ButtonMenu)<{ disabled?: boolean }>`
   width: 100%;
-
+  background-color: transparent;
   & > button {
     width: 100%;
   }
@@ -137,13 +137,13 @@ const RoiCalculator: React.FC<React.PropsWithChildren<RoiCalculatorModalProps>> 
   }, [initialValue, setPrincipalFromTokenValue]);
 
   const { targetRef, tooltip, tooltipVisible } = useTooltip(
-    `“My Balance” here includes both ${stakingTokenSymbol} in your wallet, and ${stakingTokenSymbol} already staked in this pool.`
+    `“My Balance” here is USDT onchain amount.`
   );
 
   const onBalanceFocus = () => {
     setCalculatorMode(CalculatorMode.ROI_BASED_ON_PRINCIPAL);
   };
-  const editingUnit = editingCurrency === EditingCurrency.TOKEN ? stakingTokenSymbol : "USD";
+  
   const editingValue = editingCurrency === EditingCurrency.TOKEN ? principalAsToken : principalAsUSD;
   const conversionUnit = editingCurrency === EditingCurrency.TOKEN ? "USD" : stakingTokenSymbol;
   const conversionValue = editingCurrency === EditingCurrency.TOKEN ? principalAsUSD : principalAsToken;
@@ -173,7 +173,7 @@ const RoiCalculator: React.FC<React.PropsWithChildren<RoiCalculatorModalProps>> 
       )}
       {header}
       <Flex flexDirection="column" mb="8px">
-        <Text textAlign="left" color="secondary" bold fontSize="12px" textTransform="uppercase">
+        <Text textAlign="left" color="textSubtle" bold fontSize="12px" textTransform="uppercase">
           {`${stakingTokenSymbol} staked`}
         </Text>
         <BalanceInput
@@ -182,7 +182,7 @@ const RoiCalculator: React.FC<React.PropsWithChildren<RoiCalculatorModalProps>> 
           innerRef={balanceInputRef}
           placeholder="0.00"
           value={editingValue}
-          unit={editingUnit}
+          unit='USDT'
           decimals={stakingTokenDecimals}
           onUserInput={onUserInput}
           switchEditingUnits={toggleEditingCurrency}
@@ -229,7 +229,7 @@ const RoiCalculator: React.FC<React.PropsWithChildren<RoiCalculatorModalProps>> 
         </Flex>
         {children || (
           <>
-            <Text mt="24px" textAlign="left" color="secondary" bold fontSize="12px" textTransform="uppercase">
+            <Text mt="24px" textAlign="left" color="textSubtle" bold fontSize="12px" textTransform="uppercase">
               Staked for
             </Text>
             <FullWidthButtonMenu activeIndex={stakingDuration} onItemClick={setStakingDuration} scale="sm">
@@ -244,7 +244,7 @@ const RoiCalculator: React.FC<React.PropsWithChildren<RoiCalculatorModalProps>> 
         {bCakeCalculatorSlot && bCakeCalculatorSlot(principalAsToken)}
         {autoCompoundFrequency === 0 && (
           <>
-            <Text textAlign="left" mt="24px" color="secondary" bold fontSize="12px" textTransform="uppercase">
+            <Text textAlign="left" mt="24px" color="textSubtle" bold fontSize="12px" textTransform="uppercase">
               Compounding every
             </Text>
             <Flex alignItems="center">

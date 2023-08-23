@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import styled, { useTheme } from "styled-components"
 import Modal from 'react-modal';
+import { Text } from 'rebass'
 import Logo from 'uikit/Icons/Logo'
-import { Flex, Box } from 'uikit/Box'
+import { Flex } from 'uikit/Box'
 import Button from "uikit/Button"
+import IconButton from 'uikit/Button/IconButton'
 import { MdLogout } from 'react-icons/md'
 import { BiMoneyWithdraw } from 'react-icons/bi'
 import { UserMenuItemProps } from "./types";
@@ -90,20 +92,32 @@ function Header() {
           style={customStyles}
           contentLabel="Example Modal"
         >
-          <WalletContent flexDirection="column" p="24px">
-            {connectors.map((connector) => (
-              <button
-                disabled={!connector.ready}
-                key={connector.id}
-                onClick={() => connect({ connector })}
-              >
-                {connector.name}
-                {!connector.ready && ' (unsupported)'}
-                {isLoading &&
-                  connector.id === pendingConnector?.id &&
-                  ' (connecting)'}
-              </button>
-            ))}
+          <WalletContent flexDirection="column" p="24px" mb="24px">
+            <Text fontSize={20} color={theme.colors.text}>Connect Wallet</Text>
+            <Text my="24px" fontSize={14} color={theme.colors.textSubtle}>Start by connecting with one of the wallets below. Be sure to store your private keys or seed phrase securely. Never share them with anyone.</Text>
+            <Flex style={{ gap: 12 }} justifyContent="space-around">
+              {connectors.filter(({ id }) => id !== "injected").map((connector) => (
+                <WalletButton
+                  disabled={!connector.ready}
+                  key={connector.id}
+                  onClick={() => {
+                    connect({ connector })
+                    setWalletModalIsOpen(false)
+                  }}
+                >
+                  <Flex flexDirection="column">
+                    <img alt={connector.name} src={`/wallets/${connector.id}.png`} />
+                    <Text mt="4px" fontSize={12} color={theme.colors.textSubtle}>{connector.name}</Text>
+                    {!connector.ready && ' (unsupported)'}
+                    {isLoading &&
+                      connector.id === pendingConnector?.id &&
+                      ' (connecting)'}
+                  </Flex>
+                  
+                </WalletButton>
+              ))}
+            </Flex>
+            
       
             {error && <div>{error.message}</div>}
           </WalletContent>
@@ -112,6 +126,19 @@ function Header() {
     </HeaderStyled>
   );
 }
+
+const WalletButton = styled(IconButton)`
+  height: 75px;
+  width: 75px;
+  padding: 0px;
+  >div {
+    height: 100%;
+    width: 100%
+  }
+  img {
+    height: 100%
+  }
+`
 
 const customStyles = {
   content: {
@@ -124,7 +151,9 @@ const customStyles = {
     background: "#272628",
     borderRadius: 32,
     padding: 0,
-    minWidth: 350
+    minWidth: 350,
+    maxWidth: 408,
+    height: 'fit-content'
   },
   overlay: {
     zIndex: 999,

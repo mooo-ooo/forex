@@ -119,7 +119,7 @@ const RoiCard: React.FC<React.PropsWithChildren<RoiCardProps>> = ({
   return (
     <RoiCardWrapper>
       <RoiCardInner>
-        <Text fontSize="12px" color="secondary" bold textTransform="uppercase">
+        <Text fontSize="12px" color="textSubtle" bold textTransform="uppercase">
           ROI at current rates
         </Text>
         <Flex justifyContent="space-between" mt="4px" height="36px">

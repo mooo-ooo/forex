@@ -14,6 +14,7 @@ import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { TrustWalletConnector } from './trustWallet'
 import { PUBLIC_NODES } from 'config/nodes'
 import { ThemeProvider } from 'styled-components'
 import theme from 'theme'
@@ -69,6 +70,13 @@ export const injectedConnector = new InjectedConnector({
     shimDisconnect: false,
   },
 })
+export const trustWalletConnector = new TrustWalletConnector({
+  chains,
+  options: {
+    shimDisconnect: false,
+    shimChainChangedDisconnect: true,
+  },
+})
 
 export const walletConnectConnector = new WalletConnectConnector({
   chains,
@@ -87,6 +95,7 @@ const config = createConfig({
   connectors: [
     walletConnectConnector,
     metaMaskConnector,
+    trustWalletConnector,
     injectedConnector
   ],
   publicClient,

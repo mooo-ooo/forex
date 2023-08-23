@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import BigNumber from "bignumber.js";
 import { Card } from 'uikit/Card'
 import { Flex, Box } from 'uikit/Box'
@@ -27,7 +27,10 @@ const USDT = '/tokens/usdt.png'
 const DEPOSIT_WALLET = '0x67668dcf335ba40dc14df836a9942b3d47205dec'
 const spinnerIcon = <AutoRenewIcon spin color="currentColor" />
 
+const LOT_AMOUNT = 775
+
 function Home() {
+  const [swapPerLot, setSwapPerLot] = useState(2)
   const { toastSuccess, toastError } = useToast()
   const { address } = useAccount()
   const { chain } = useNetwork()
@@ -41,6 +44,8 @@ function Home() {
   
   const [amount, setAmount] = useState('')
   const [debouncedAmount] = useDebounce(isNumeric(amount) ? amount : '0' , 500)
+
+  const apr = useMemo(() => swapPerLot / LOT_AMOUNT * 365 * 100, [swapPerLot])
 
   const { config, error } = usePrepareContractWrite({
     address: usdtAddress,
@@ -166,7 +171,7 @@ function Home() {
         <RoiCalculator
           account={address as string}
           earningTokenPrice={1}
-          apr={80}
+          apr={apr}
           linkLabel="USDT Contract"
           linkHref="https://bscscan.com/address/0x55d398326f99059ff775485246999027b3197955#code"
           stakingTokenBalance={new BigNumber(onChainBalanceDec)}

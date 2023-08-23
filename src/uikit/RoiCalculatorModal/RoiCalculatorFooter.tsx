@@ -1,10 +1,10 @@
 import { getApy } from "utils/compoundApyHelpers";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { useTooltip } from "../../hooks/useTooltip";
 import { Box, Flex, Grid } from "../Box";
 import { ExpandableLabel } from "../Button/ExpandableButton";
-import { Link, LinkExternal } from "../Link";
+import { LinkExternal } from "../Link";
 import { Text } from "../Text";
 
 export const Footer = styled(Flex)`
@@ -52,18 +52,11 @@ const RoiCalculatorFooter: React.FC<React.PropsWithChildren<RoiCalculatorFooterP
   isFarm,
   apr = 0,
   apy = 0,
-  displayApr,
   autoCompoundFrequency,
-  multiplier,
   linkLabel,
   linkHref,
   performanceFee,
-  rewardCakePerSecond,
   isLocked = false,
-  stableSwapAddress,
-  stableLpFee,
-  farmCakePerSecond,
-  totalMultipliers,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -84,13 +77,6 @@ const RoiCalculatorFooter: React.FC<React.PropsWithChildren<RoiCalculatorFooterP
             <Text small textAlign="right">
               {Number.isFinite(apy) && apy !== 0 ? apy.toFixed(2) : apr?.toFixed(2)}%
             </Text>
-            {/* {!Number.isFinite(apy) && (
-              <Text color="textSubtle" small>
-                {t("APY (%compoundTimes%x daily compound)", {
-                  compoundTimes: autoCompoundFrequency > 0 ? autoCompoundFrequency : 1,
-                })}
-              </Text>
-            )} */}
             {!Number.isFinite(apy) && (
               <Text small textAlign="right">
                 {(
