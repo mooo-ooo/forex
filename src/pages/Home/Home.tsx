@@ -1,19 +1,29 @@
 import { useEffect, useState, useMemo } from 'react'
 import BigNumber from "bignumber.js";
-import { Card } from 'uikit/Card'
 import { Flex, Box } from 'uikit/Box'
 import { Text } from 'rebass'
 import Button from 'uikit/Button'
 import { Input } from 'uikit/Input'
 import { Balance } from 'uikit/Balance'
 import { AiOutlineFieldTime } from 'react-icons/ai'
-import styled, { useTheme } from 'styled-components'
+import { useTheme } from 'styled-components'
 import LineChart from 'uikit/LineChart/LineChart';
 import TokenPairImage from 'uikit/Image/TokenPairImage'
 import TokenImage from 'uikit/Image/TokenImage'
 import AutoRenewIcon from 'uikit/Icons/AutoRenew'
+import CalculateIcon from 'uikit/Icons/Calculate'
 import { useAccount, useNetwork, usePrepareContractWrite, useWaitForTransaction, useContractWrite, useBalance } from 'wagmi'
 import { usdt } from 'config/token'
+import {
+  StyledCard,
+  CardFooter,
+  CardBody,
+  CardRow,
+  CardHeader,
+  FarmCardInnerContainer,
+  ForexInputGroup
+} from './styles'
+import { useChartData } from './hook'
 import ERC20Abi from 'config/abi/erc20.json'
 import { useToast } from 'contexts/ToastsContext/useToast'
 import { useDebounce } from 'use-debounce'
@@ -76,27 +86,21 @@ function Home() {
 
   const onChainBalanceDec = Number(formatBigInt(usdtBalance?.value as any || BigInt(0), 3, usdtBalance?.decimals))
 
+  const charts = useChartData({
+    amount: 10000,
+    apr,
+    compoundEvery: 7
+  })
+
+  console.log({
+    charts,
+    apr
+  })
+
   return (
     <Flex className="App" justify-content="center" flexDirection="column">
       <LineChart
-        data={[
-          {
-            time: new Date('Fri Aug 18 2023'),
-            value: 2
-          },
-          {
-            time: new Date('Fri Aug 19 2023'),
-            value: 7
-          },
-          {
-            time: new Date('Fri Aug 20 2023'),
-            value: 12
-          },
-          {
-            time: new Date('Fri Aug 21 2023'),
-            value: 37
-          }
-        ]}
+        data={charts}
         color='#9A6AFF'
         minHeight={340}
         value={5}
@@ -116,7 +120,7 @@ function Home() {
           <CardBody>
             <CardRow>
               <AprRowWithToolTip questionTooltip="" />
-              <Text fontSize={14} color={textSubtle}>80%</Text>
+              <Text fontSize={14} color={textSubtle}>{apr}%</Text>
             </CardRow>
             <CardRow mt="24px">
               <Text fontSize={12} fontWeight='bold' color={textSubtle}>
@@ -167,90 +171,34 @@ function Home() {
           </CardFooter>
         </FarmCardInnerContainer>
       </StyledCard>
-      <ROIStyled>
-        <RoiCalculator
-          account={address as string}
-          earningTokenPrice={1}
-          apr={apr}
-          linkLabel="USDT Contract"
-          linkHref="https://bscscan.com/address/0x55d398326f99059ff775485246999027b3197955#code"
-          stakingTokenBalance={new BigNumber(onChainBalanceDec)}
-          stakingTokenDecimals={2}
-          stakingTokenSymbol="USDT"
-          stakingTokenPrice={1}
-          earningTokenSymbol="USDT"
-        />
-      </ROIStyled>
+      <StyledCard>
+        <FarmCardInnerContainer>
+          <CardHeader justifyContent="space-between">
+            <Flex justifyContent="space-between" width="100%">
+              <Text fontSize={24} fontWeight='bold' color={textSecondary}>ROI Calculator</Text>
+              <CalculateIcon height={32} width={32} />
+            </Flex>
+            
+          </CardHeader>
+          <CardBody>
+            <RoiCalculator
+              account={address as string}
+              earningTokenPrice={1}
+              apr={apr}
+              linkLabel="USDT Contract"
+              linkHref="https://bscscan.com/address/0x55d398326f99059ff775485246999027b3197955#code"
+              stakingTokenBalance={new BigNumber(onChainBalanceDec)}
+              stakingTokenDecimals={2}
+              stakingTokenSymbol="USDT"
+              stakingTokenPrice={1}
+              earningTokenSymbol="USDT"
+            />
+          </CardBody>
+        </FarmCardInnerContainer>
+      </StyledCard>
       
     </Flex>
   );
 }
 
 export default Home;
-
-const ROIStyled = styled(Card)`
-  align-self: baseline;
-  padding: 16px;
-  max-width: 100%;
-  margin: 0 0 24px 0;
-  width: 350px;
-  text-align: left;
-  ${({ theme }) => theme.mediaQueries.sm} {
-    max-width: 350px;
-    margin: 0 12px 46px;
-  }
-`
-
-const CardBody = styled(Flex)`
-  padding: 16px;
-  flex-direction: column;
-  margin-top: 24px;
-`
-
-const CardFooter = styled(Flex)`
-  padding: 16px;
-  flex-direction: column;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-`
-
-const CardRow = styled(Flex)`
-  justify-content: space-between;
-  width: 100%;
-  align-items: center
-`
-const CardHeader = styled(Flex)`
-  background: linear-gradient(166.77deg,#3b4155,#3a3045);
-  border-radius: var(--radii-card) var(--radii-card) 0 0;
-  padding: 16px;
-`;
-
-const StyledCard = styled(Card)`
-  align-self: baseline;
-  max-width: 100%;
-  margin: 0 0 24px 0;
-  width: 350px;
-  ${({ theme }) => theme.mediaQueries.sm} {
-    max-width: 350px;
-    margin: 0 12px 46px;
-  }
-`
-
-const FarmCardInnerContainer = styled(Flex)`
-  flex-direction: column;
-  justify-content: space-around;
-`
-
-const ForexInputGroup = styled(Flex)`
-  position: relative;
-  input {
-    height: 75px;
-    width: 100%;
-    background: transparent;
-  }
-  .btn-action {
-    position: absolute;
-    margin: auto;
-    right: 12px;
-    top: 12px;
-  }
-`

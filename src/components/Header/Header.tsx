@@ -28,7 +28,7 @@ function Header() {
   const accountEllipsis = address ? `${address.substring(0, 2)}...${address.substring(address.length - 4)}` : undefined;
   const [modalIsOpen, setIsOpen] = useState(false);
   const [walletModalIsOpen, setWalletModalIsOpen] = useState(false);
-  console.log({connectors})
+  // console.log({connectors})
   return (
     <HeaderStyled>
       <Container width='100%'>
