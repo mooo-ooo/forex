@@ -4,7 +4,7 @@ import utc from 'dayjs/plugin/utc'
 import { useTheme, keyframes} from 'styled-components'
 import { darken } from 'polished'
 import React, { Dispatch, ReactNode, SetStateAction } from 'react'
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled from 'styled-components'
 
 const Row = styled(Box)<{
@@ -39,7 +39,6 @@ const Wrapper = styled(Box)`
   display: flex;
   background-color: transparent;
   flex-direction: column;
-  padding: 1rem;
   > * {
     font-size: 1rem;
   }
@@ -97,9 +96,9 @@ const Chart = ({
             data={data}
             margin={{
               top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
+              right: 0,
+              left: 0,
+              bottom: 15,
             }}
             onMouseLeave={() => {
               if (setLabel) setLabel(undefined)
@@ -116,20 +115,24 @@ const Chart = ({
               dataKey="time"
               axisLine={false}
               tickLine={false}
-              tickFormatter={(time) => dayjs(time).format('DD')}
+              tickFormatter={(time) => dayjs(time).format('MMM')}
               minTickGap={10}
+            />
+            <YAxis
+              dataKey="value"
+              axisLine={false}
+              tickLine={false}
+              // tickFormatter={(time) => dayjs(time).format('DD')}
+              minTickGap={10}
+              tick={{fontSize: 14}}
             />
             <Tooltip
               cursor={{ stroke: theme.colors.backgroundAlt2 }}
-              contentStyle={{ display: 'none' }}
+              // contentStyle={{ display: 'none' }}
               formatter={(tooltipValue, name, props) => {
-                if (setValue && parsedValue !== props.payload.value) {
-                  setValue(props.payload.value)
-                }
-                const formattedTime = dayjs(props.payload.time).format('MMM D, YYYY')
-                if (setLabel && label !== formattedTime) setLabel(formattedTime)
-                return 'null'
+                return tooltipValue
               }}
+              
             />
             <Area dataKey="value" type="monotone" stroke={color} fill="url(#gradient)" strokeWidth={2} />
           </AreaChart>

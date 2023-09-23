@@ -78,13 +78,13 @@ export const trustWalletConnector = new TrustWalletConnector({
   },
 })
 
-export const walletConnectConnector = new WalletConnectConnector({
-  chains,
-  options: {
-    showQrModal: true,
-    projectId: 'e542ff314e26ff34de2d4fba98db70bb',
-  },
-})
+// export const walletConnectConnector = new WalletConnectConnector({
+//   chains,
+//   options: {
+//     showQrModal: true,
+//     projectId: 'e542ff314e26ff34de2d4fba98db70bb',
+//   },
+// })
 
 const config = createConfig({
   storage: createStorage({
@@ -93,7 +93,7 @@ const config = createConfig({
   }),
   autoConnect: false,
   connectors: [
-    walletConnectConnector,
+    // walletConnectConnector,
     metaMaskConnector,
     trustWalletConnector,
     injectedConnector

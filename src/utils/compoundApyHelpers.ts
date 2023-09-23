@@ -1,5 +1,5 @@
 // 1 day, 7 days, 30 days, 1 year, 5 years
-const DAYS_TO_CALCULATE_AGAINST = [1, 7, 30, 365, 1825]
+const DAYS_TO_CALCULATE_AGAINST = [30, 60, 90, 120, 365]
 
 /**
  *
@@ -7,7 +7,6 @@ const DAYS_TO_CALCULATE_AGAINST = [1, 7, 30, 365, 1825]
  * @param apr - farm or pool apr as percentage. If its farm APR its only cake rewards APR without LP rewards APR
  * @param earningTokenPrice - price of reward token
  * @param compoundFrequency - how many compounds per 1 day, e.g. 1 = one per day, 0.142857142 - once per week
- * @param performanceFee - performance fee as percentage
  * @returns an array of token values earned as interest, with each element representing interest earned over a different period of time (DAYS_TO_CALCULATE_AGAINST)
  */
 export const getInterestBreakdown = ({
@@ -15,13 +14,13 @@ export const getInterestBreakdown = ({
   apr,
   earningTokenPrice,
   compoundFrequency = 1,
-  performanceFee = 0,
+  daysToCalculateAgainst = DAYS_TO_CALCULATE_AGAINST
 }: {
   principalInUSD: number
   apr: number
   earningTokenPrice: number
   compoundFrequency?: number
-  performanceFee?: number
+  daysToCalculateAgainst?: number[]
 }) => {
   // Everything here is worked out relative to a year, with the asset compounding at the compoundFrequency rate. 1 = once per day
   const timesCompounded = 365 * compoundFrequency
@@ -33,7 +32,7 @@ export const getInterestBreakdown = ({
   const isHighValueToken = Math.round(earningTokenPrice / 1000) > 0
   const roundingDecimalsNew = isHighValueToken ? 5 : 3
 
-  return DAYS_TO_CALCULATE_AGAINST.map((days) => {
+  return daysToCalculateAgainst.map((days) => {
     const daysAsDecimalOfYear = days / 365
     // Calculate the starting TOKEN balance with a dollar balance of principalInUSD.
     const principal = principalInUSD / earningTokenPrice
@@ -43,11 +42,6 @@ export const getInterestBreakdown = ({
       const accruedAmount = principal * (1 + aprAsDecimal / timesCompounded) ** (timesCompounded * daysAsDecimalOfYear)
       // To get the TOKEN amount earned, deduct the amount after compounding (accruedAmount) from the starting TOKEN balance (principal)
       interestEarned = accruedAmount - principal
-      if (performanceFee) {
-        const performanceFeeAsDecimal = performanceFee / 100
-        const performanceFeeAsAmount = interestEarned * performanceFeeAsDecimal
-        interestEarned -= performanceFeeAsAmount
-      }
     }
     return parseFloat(interestEarned.toFixed(roundingDecimalsNew))
   })

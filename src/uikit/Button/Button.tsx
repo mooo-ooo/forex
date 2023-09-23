@@ -55,6 +55,7 @@ interface TransientButtonProps extends ThemedButtonProps {
 }
 
 const getDisabledStyles = ({ $isLoading, theme }: TransientButtonProps) => {
+
   if ($isLoading === true) {
     return `
       &:disabled,
@@ -67,7 +68,10 @@ const getDisabledStyles = ({ $isLoading, theme }: TransientButtonProps) => {
   return `
     &:disabled,
     &.button--disabled {
+      background-color: ${theme.colors.backgroundDisabled};
+      border-color: ${theme.colors.backgroundDisabled};
       box-shadow: none;
+      color: ${theme.colors.textDisabled};
       cursor: not-allowed;
     }
   `;

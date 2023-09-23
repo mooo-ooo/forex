@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { getInterestBreakdown } from 'utils/compoundApyHelpers'
+import dayjs from 'dayjs'
 
 interface IChartData {
   amount: number,
@@ -7,45 +9,63 @@ interface IChartData {
 }
 
 interface IReport {
-  time: Date
+  time: string
   value: number,
-  isCompounded: boolean
 }
 
 export const useChartData = ({
   amount,
   apr,
-  compoundEvery = 7 // weekly compound
+  compoundEvery = 30 // weekly compound
 }: IChartData) => {
   const period = 30
   const interestDay = apr / 365 / 100
-  const [report, setReport] = useState<IReport[]>([])
+  const [charts, setCharts] = useState<IReport[]>([])
+
+  const interestBreakdown = useMemo(() => {
+    let daysToCalculateAgainst: number[] = []
+    const numberOfCompounding = Math.floor(365 / period)
+
+    for (let index = 1; index < numberOfCompounding; index++) {
+      daysToCalculateAgainst.push(index * 30)
+    }
+    daysToCalculateAgainst.push(365)
+
+    return getInterestBreakdown({
+      daysToCalculateAgainst,
+      compoundFrequency: 1 / compoundEvery,
+      principalInUSD: amount,
+      apr,
+      earningTokenPrice: 1,
+    })
+  }, [period, apr, compoundEvery, amount])
 
   useEffect(() => {
-    let dates = []
-    let balanceSoFar = amount
-    let swapSoFar = 0
-    for (let index = 0; index < period; index++) {
-      const shouldCompound = ((index + 1) % compoundEvery) === 0
-      swapSoFar = (balanceSoFar * interestDay) + swapSoFar
-      const newDate = {
-        time: addDays(new Date(), index),
-        value: balanceSoFar + swapSoFar,
-        isCompounded: shouldCompound
+    const results = interestBreakdown.map((interest, index) => {
+      return {
+        time: dayjs().add(index * 30, 'day').format('D MMM YYYY'),
+        value: (amount + interest),
       }
-      if (shouldCompound) {
-        balanceSoFar = balanceSoFar + swapSoFar
-        swapSoFar = 0
-      }
-      dates.push(newDate)
-    }
-    setReport(dates)
-  }, [amount, compoundEvery, interestDay])
-  return report
+    })
+    
+    setCharts(results)
+  }, [amount, compoundEvery, interestDay, interestBreakdown])
+  return charts
 }
 
-function addDays(date: Date, days: number) {
-  const dateCopy = new Date(date)
-  dateCopy.setDate(date.getDate() + days)
-  return dateCopy
+interface ICap {
+  cap: number
+  swap: number
+}
+
+export const calcAverageSwap = (capWithSwaps: ICap[]) => {
+  const totalCap = capWithSwaps.reduce((sum, { cap }) => sum + cap, 0)
+  const withWeight = capWithSwaps.map(item => {
+    return {
+      ...item,
+      weight: item.cap / totalCap
+    }
+  })
+  const result = withWeight.reduce((average, { swap, weight }) => average + (swap * weight), 0)
+  return result
 }

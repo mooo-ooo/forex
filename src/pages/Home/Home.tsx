@@ -40,7 +40,7 @@ const spinnerIcon = <AutoRenewIcon spin color="currentColor" />
 const LOT_AMOUNT = 775
 
 function Home() {
-  const [swapPerLot, setSwapPerLot] = useState(2)
+  const [swapPerLot, setSwapPerLot] = useState(1.14)
   const { toastSuccess, toastError } = useToast()
   const { address } = useAccount()
   const { chain } = useNetwork()
@@ -52,8 +52,9 @@ function Home() {
     watch: true
   })
   
-  const [amount, setAmount] = useState('')
-  const [debouncedAmount] = useDebounce(isNumeric(amount) ? amount : '0' , 500)
+  const [initBalance, setInitBalance] = useState<number>(10000)
+  const [depositAmount, setDepositAmount] = useState('')
+  const [debouncedAmount] = useDebounce(isNumeric(depositAmount) ? depositAmount : '0' , 500)
 
   const apr = useMemo(() => swapPerLot / LOT_AMOUNT * 365 * 100, [swapPerLot])
 
@@ -89,114 +90,133 @@ function Home() {
   const charts = useChartData({
     amount: 10000,
     apr,
-    compoundEvery: 7
+    compoundEvery: 30
   })
 
-  console.log({
-    charts,
-    apr
-  })
+  const endTerm = charts[charts.length - 1]
 
   return (
     <Flex className="App" justify-content="center" flexDirection="column">
-      <LineChart
-        data={charts}
-        color='#9A6AFF'
-        minHeight={340}
-        value={5}
-        label='test'
-        // setValue={setLatestValue}
-        // setLabel={setValueLabel}
-      />
-      <StyledCard>
-        <FarmCardInnerContainer>
-          <CardHeader justifyContent="space-between">
-            <Flex flexDirection="column" alignItems="flex-start">
-              <Text fontSize={24} fontWeight='bold' color={textSecondary}>Earn USDT</Text>
-              <Text fontSize={14} color={textSubtle}>Stake USDT</Text>
-            </Flex>
-            <TokenPairImage primarySrc={USDT} secondarySrc={USDT} width={64} height={64} />
-          </CardHeader>
-          <CardBody>
-            <CardRow>
-              <AprRowWithToolTip questionTooltip="" />
-              <Text fontSize={14} color={textSubtle}>{apr}%</Text>
-            </CardRow>
-            <CardRow mt="24px">
-              <Text fontSize={12} fontWeight='bold' color={textSubtle}>
-                USDT&nbsp; 
-                <span style={{ color: textSecondary }}>Onchain</span>
-              </Text>
-              <Flex alignItems="center">
-                <Box width="32px"><TokenImage src={USDT} height={24} width={24} /></Box>
-                <Balance fontSize={20} fontWeight={600} color={textSubtle} value={onChainBalanceDec || 0} decimals={2} />
-              </Flex>
-            </CardRow>
-            <CardRow mb="16px" mt="24px">
-              <Text fontSize={20} fontWeight={600} color={textSubtle}>
-                5,000 ~USD
-              </Text>
-              <Button variant='secondary'>Invest</Button>
-            </CardRow>
-            <CardRow mb="4px">
-              <Text fontSize={12} color={textSubtle}>USDT</Text>
-              <Text fontSize={12} color={textSubtle}>Balance: 1,200</Text>
-            </CardRow>
-            <ForexInputGroup>
-              <Input color={textSubtle} type="number" onChange={(e) => setAmount(e.target.value)}/>
-              <Button
-                isLoading={isDepositing || isWalletLoading}
-                disabled={!deposit}
-                className='btn-action'
-                mt="12px"
-                variant='primary'
-                onClick={() => deposit?.()}
-                endIcon={(isDepositing || isWalletLoading) ? spinnerIcon : undefined}
-              >
-                Deposit
-              </Button>
-            </ForexInputGroup>
-            <Text fontSize={12} color={textSubtle}>{error?.message}</Text>
-            
-          </CardBody>
-          <CardFooter>
-            <CardRow>
-              <Text color={textSubtle}>Total balance</Text>
-              <Text color={textSubtle}>USDT: 1,200</Text>
-            </CardRow>
-            <CardRow>
-              <Text color={textSubtle}>End in</Text>
-              <Text color={textSubtle}>5 days <AiOutlineFieldTime /></Text>
-            </CardRow>
-          </CardFooter>
-        </FarmCardInnerContainer>
-      </StyledCard>
-      <StyledCard>
-        <FarmCardInnerContainer>
-          <CardHeader justifyContent="space-between">
-            <Flex justifyContent="space-between" width="100%">
-              <Text fontSize={24} fontWeight='bold' color={textSecondary}>ROI Calculator</Text>
-              <CalculateIcon height={32} width={32} />
-            </Flex>
-            
-          </CardHeader>
-          <CardBody>
-            <RoiCalculator
-              account={address as string}
-              earningTokenPrice={1}
-              apr={apr}
-              linkLabel="USDT Contract"
-              linkHref="https://bscscan.com/address/0x55d398326f99059ff775485246999027b3197955#code"
-              stakingTokenBalance={new BigNumber(onChainBalanceDec)}
-              stakingTokenDecimals={2}
-              stakingTokenSymbol="USDT"
-              stakingTokenPrice={1}
-              earningTokenSymbol="USDT"
-            />
-          </CardBody>
-        </FarmCardInnerContainer>
-      </StyledCard>
+      <Flex my="24px" justifyContent="space-between" alignItems="flex-start">
+        <Flex flexDirection="column" alignItems="flex-start">
+          <Text fontSize={16} color={textSubtle}>Initial balance</Text>
+          <Flex alignItems="center">
+            <Box width="24px"><TokenImage src={USDT} height={16} width={16} /></Box>
+            <Balance fontSize={14} fontWeight={600} color={textSubtle} value={initBalance || 0} decimals={2} />
+          </Flex>
+        </Flex>
+        <Flex flexDirection="column" alignItems="flex-end">
+          <Text fontSize={16} color={textSubtle}>Final balance</Text>
+          
+          <Flex alignItems="center">
+            <Box width="24px"><TokenImage src={USDT} height={16} width={16} /></Box>
+            <Balance fontSize={14} fontWeight={600} color={textSubtle} value={endTerm?.value || 0} decimals={2} />
+          </Flex>
+          <Text fontSize={12} color={textSubtle}>({endTerm?.time})</Text>
+        </Flex>
+      </Flex>
       
+      <Box my="12px">
+        <LineChart
+          data={charts}
+          color='#9A6AFF'
+          minHeight={340}
+        />
+      </Box>
+      
+      <Flex justifyContent="center">
+        <StyledCard>
+          <FarmCardInnerContainer>
+            <CardHeader justifyContent="space-between">
+              <Flex flexDirection="column" alignItems="flex-start">
+                <Text fontSize={24} fontWeight='bold' color={textSecondary}>Earn USDT</Text>
+                <Text fontSize={14} color={textSubtle}>Stake USDT</Text>
+              </Flex>
+              <TokenPairImage primarySrc={USDT} secondarySrc={USDT} width={64} height={64} />
+            </CardHeader>
+            <CardBody>
+              <CardRow>
+                <AprRowWithToolTip questionTooltip="" />
+                <Text fontSize={14} color={textSubtle}>{apr}%</Text>
+              </CardRow>
+              <CardRow mt="24px">
+                <Text fontSize={12} fontWeight='bold' color={textSubtle}>
+                  USDT&nbsp; 
+                  <span style={{ color: textSecondary }}>Onchain</span>
+                </Text>
+                <Flex alignItems="center">
+                  <Box width="32px"><TokenImage src={USDT} height={24} width={24} /></Box>
+                  <Balance fontSize={20} fontWeight={600} color={textSubtle} value={onChainBalanceDec || 0} decimals={2} />
+                </Flex>
+              </CardRow>
+              <CardRow mb="16px" mt="24px">
+                <Text fontSize={20} fontWeight={600} color={textSubtle}>
+                  5,000 ~USD
+                </Text>
+                <Button variant='secondary'>Invest</Button>
+              </CardRow>
+              <CardRow mb="4px">
+                <Text fontSize={12} color={textSubtle}>USDT</Text>
+                <Text fontSize={12} color={textSubtle}>Balance: 1,200</Text>
+              </CardRow>
+              <ForexInputGroup>
+                <Input color={textSubtle} type="number" onChange={(e) => setDepositAmount(e.target.value)}/>
+                <Button
+                  isLoading={isDepositing || isWalletLoading}
+                  disabled={!deposit && Number(debouncedAmount) <= 0}
+                  className='btn-action'
+                  mt="12px"
+                  variant='primary'
+                  onClick={() => deposit?.()}
+                  endIcon={(isDepositing || isWalletLoading) ? spinnerIcon : undefined}
+                >
+                  Deposit
+                </Button>
+              </ForexInputGroup>
+              <Text fontSize={12} color={textSubtle}>{error?.message}</Text>
+              
+            </CardBody>
+            <CardFooter>
+              <CardRow>
+                <Text color={textSubtle}>Total balance</Text>
+                <Text color={textSubtle}>USDT: 1,200</Text>
+              </CardRow>
+              <CardRow>
+                <Text color={textSubtle}>End in</Text>
+                <Text color={textSubtle}>5 days <AiOutlineFieldTime /></Text>
+              </CardRow>
+            </CardFooter>
+          </FarmCardInnerContainer>
+        </StyledCard>
+      </Flex>
+      
+      <Flex justifyContent="center">
+        <StyledCard>
+          <FarmCardInnerContainer>
+            <CardHeader justifyContent="space-between">
+              <Flex justifyContent="space-between" width="100%">
+                <Text fontSize={24} fontWeight='bold' color={textSecondary}>ROI Calculator</Text>
+                <CalculateIcon height={32} width={32} />
+              </Flex>
+              
+            </CardHeader>
+            <CardBody>
+              <RoiCalculator
+                account={address as string}
+                earningTokenPrice={1}
+                apr={apr}
+                linkLabel="USDT Contract"
+                linkHref="https://bscscan.com/address/0x55d398326f99059ff775485246999027b3197955#code"
+                stakingTokenBalance={new BigNumber(onChainBalanceDec)}
+                stakingTokenDecimals={2}
+                stakingTokenSymbol="USDT"
+                stakingTokenPrice={1}
+                earningTokenSymbol="USDT"
+              />
+            </CardBody>
+          </FarmCardInnerContainer>
+        </StyledCard>
+      </Flex>
     </Flex>
   );
 }

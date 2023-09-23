@@ -274,7 +274,6 @@ export function DefaultCompoundStrategy({
         apr,
         earningTokenPrice,
         compoundFrequency,
-        performanceFee,
       });
       const hasInterest = !Number.isNaN(interestBreakdown[stakingDuration]);
       const roiTokens = hasInterest ? interestBreakdown[stakingDuration] : 0;

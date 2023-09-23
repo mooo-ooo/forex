@@ -149,7 +149,7 @@ const RoiCalculator: React.FC<React.PropsWithChildren<RoiCalculatorModalProps>> 
   const conversionValue = editingCurrency === EditingCurrency.TOKEN ? principalAsUSD : principalAsToken;
   const onUserInput = editingCurrency === EditingCurrency.TOKEN ? setPrincipalFromTokenValue : setPrincipalFromUSDValue;
 
-  const DURATION = useMemo(() => ["1D", "7D", "30D", "1Y", "5Y"], []);
+  const DURATION = useMemo(() => ["30D", "60D", "90D", "120D", "1Y"], []);
 
   const isDisableMyBalance = useMemo(() => {
     return (
