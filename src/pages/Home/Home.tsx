@@ -85,7 +85,7 @@ function Home() {
     }
   }, [depositWriteError, toastError])
 
-  const onChainBalanceDec = Number(formatBigInt(usdtBalance?.value as any || BigInt(0), 3, usdtBalance?.decimals))
+  const onChainBalanceDec =  usdtBalance ? Number(formatBigInt(usdtBalance?.value, 3, usdtBalance?.decimals)) : 0
 
   const charts = useChartData({
     amount: 10000,
